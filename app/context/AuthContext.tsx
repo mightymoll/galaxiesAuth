@@ -17,19 +17,39 @@ const AuthContext = createContext<AuthProps>({});
 
 export const useAuth = ()=> {
 	return useContext(AuthContext);
-}
+};
 
 // return object wrapping all of the children
 export const AuthProvider = ({children}:any) => {
-
-// define state for auth status
-const [authState, setAuthState] = useState<{
-	token: string | null;
-	authenticated: boolean | null;
-}>({//default values
-	token: null,
-	authenticated:null,
+	// define state for auth status
+	const [authState, setAuthState] = useState<{
+		token: string | null;
+		authenticated: boolean | null;
+	}>({//default values
+		token: null,
+		authenticated:null,
 });
+
+
+// check for token when application starts
+useEffect(()=>{
+	// load token from secure storage
+	const loadToken = async () => {
+		const token = await SecureStore.getItemAsync(TOKEN_KEY);
+		console.log("stored:", token)
+
+		//if it exists, set it in the http headers & update state
+		if(token){
+			axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+			setAuthState({
+				token: token,
+				authenticated: true,
+			});
+		}
+	};
+	loadToken();
+ },[]);
 
 // register user : async post user email and password to API/users
 const register = async (email:string, password:string)=>{
