@@ -1,11 +1,21 @@
 import { View, TextInput, Image, Button, StyleSheet } from 'react-native';
-import React, {useState} from 'react';
-import {useAuth} from '../context/AuthContext'
+import React, {useState, useEffect} from 'react';
+import {API_URL, useAuth} from '../context/AuthContext'
+import axios from 'axios';
 
 const Login = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const {onLogin, onRegister} = useAuth();
+
+	useEffect(()=>{
+		const testCall = async () => {
+			const result = await axios.get(`${API_URL}/users`);
+
+			console.log('file: Login.tsx testCall result:', result.status)
+		};
+		testCall();
+	}, []);
 
 // alert if login is not successful
 	const login = async ()=>{
